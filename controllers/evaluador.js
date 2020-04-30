@@ -1,5 +1,5 @@
 const s_pg = require("../services/postgres")
-
+const function_error = require('../utils/utils')
 
 
 let guardar_evaluador = async(req, res) => {
@@ -14,12 +14,7 @@ let guardar_evaluador = async(req, res) => {
             message: ' evaluador agregado ',
             evaluador: bd_res
         })
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    })
+    }).catch(function_error)
 
 
 }
@@ -32,12 +27,7 @@ let obtener_evaluadores = async(req, res) => {
             message: ' exitoso ',
             evaluador: bd_res.rows
         });
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 }
 
 let obtener_evaluador = async(req, res) => {
@@ -49,12 +39,7 @@ let obtener_evaluador = async(req, res) => {
             message: ' evaluador agregado ',
             evaluador: bd_res.rows[0]
         })
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 
 }
 
@@ -74,12 +59,7 @@ let actualizar_evaluador = async(req, res) => {
             message: ' evaluador agregado ',
             evaluador: bd_res.rows[0]
         });
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 }
 
 let eliminar_evaluador = async(req, res) => {
@@ -91,12 +71,7 @@ let eliminar_evaluador = async(req, res) => {
             message: ' eliminado ',
             evaluador: bd_res
         });
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 
 
 }

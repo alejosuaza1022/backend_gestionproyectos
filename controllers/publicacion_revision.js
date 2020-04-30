@@ -1,5 +1,5 @@
 const s_pg = require("../services/postgres")
-
+const function_error = require('../utils/utils')
 
 
 let guardar_publicacion_revision = async(req, res) => {
@@ -25,13 +25,8 @@ let guardar_publicacion_revision = async(req, res) => {
         }
     }).catch(function_error)
 }
-let function_error = error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    }
-    // para poder verificar que un autor no suba dos propuesta para revisar al mismo tiempo
+
+// para poder verificar que un autor no suba dos propuesta para revisar al mismo tiempo
 async function verificar_revision(idpublicacion) {
     let servicio = new s_pg();
     const estado = 0

@@ -1,5 +1,5 @@
 const s_pg = require("../services/postgres")
-
+const function_error = require('../utils/utils')
 
 
 let guardar_registro_evaluacion = async(req, res) => {
@@ -15,18 +15,22 @@ let guardar_registro_evaluacion = async(req, res) => {
         registro_evaluacion.idevaluador, registro_evaluacion.idpublicacionrevision
     ]).
     then(bd_res => {
-        res.status(200).send({
-            message: ' registro_evaluacion agregado ',
-            registro_evaluacion: bd_res
-        })
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    })
+        actualizar_estado.then(bd_resp => {
+            res.status(200).send({
+                message: ' registro_evaluacion agregado ',
+                actualizado: bd_resp,
+                registro_evaluacion: bd_res
+            })
+        }).catch(function_error)
+    }).catch(function_error)
 
 
+}
+async function actualizar_estado(idpublicacionrevision) {
+    let servicio = new s_pg();
+    const estado = 1;
+    let sql = 'update publicacionrevision set estado = $1 where id = $5;';
+    return await servicio.eje_sql(sql, [estado, idpublicacionrevision])
 }
 
 let obtener_registro_evaluaciones = async(req, res) => {
@@ -37,12 +41,7 @@ let obtener_registro_evaluaciones = async(req, res) => {
             message: ' exitoso ',
             registro_evaluacion: bd_res.rows
         });
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 }
 
 let obtener_registro_evaluacion = async(req, res) => {
@@ -54,12 +53,7 @@ let obtener_registro_evaluacion = async(req, res) => {
             message: ' registro_evaluacion agregada ',
             registro_evaluacion: bd_res.rows[0]
         })
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 
 }
 
@@ -81,12 +75,7 @@ let actualizar_registro_evaluacion = async(req, res) => {
             message: ' registro_evaluacion agregado ',
             registro_evaluacion: bd_res.rows[0]
         });
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 }
 
 let eliminar_registro_evaluacion = async(req, res) => {
@@ -98,12 +87,7 @@ let eliminar_registro_evaluacion = async(req, res) => {
             message: ' eliminado ',
             registro_evaluacion: bd_res
         });
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 
 
 }

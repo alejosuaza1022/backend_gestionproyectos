@@ -1,5 +1,5 @@
 const s_pg = require("../services/postgres")
-
+const function_error = require('../utils/utils')
 
 
 let guardar_publicacion = async(req, res) => {
@@ -31,12 +31,7 @@ let obtener_revisiones_publicacion = async(req, res) => {
             message: ' exitoso ',
             publicacion_revision: bd_res.rows
         });
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 }
 let obtener_publicaciones_autor = async(req, res) => {
     let servicio = new s_pg();
@@ -47,12 +42,7 @@ let obtener_publicaciones_autor = async(req, res) => {
             message: ' exitoso ',
             publicacion: bd_res.rows
         });
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 
 }
 let obtener_publicaciones = async(req, res) => {
@@ -63,12 +53,7 @@ let obtener_publicaciones = async(req, res) => {
             message: ' exitoso ',
             publicacion: bd_res.rows
         });
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 }
 
 let obtener_publicacion = async(req, res) => {
@@ -80,12 +65,7 @@ let obtener_publicacion = async(req, res) => {
             message: ' publicacion agregada ',
             publicacion: bd_res.rows[0]
         })
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 
 }
 
@@ -101,12 +81,7 @@ let actualizar_publicacion = async(req, res) => {
             message: ' publicacion agregado ',
             publicacion: bd_res.rows[0]
         });
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 }
 
 let eliminar_publicacion = async(req, res) => {
@@ -118,12 +93,7 @@ let eliminar_publicacion = async(req, res) => {
             message: ' eliminado ',
             publicacion: bd_res
         });
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 
 
 }

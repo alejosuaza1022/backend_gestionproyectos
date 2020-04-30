@@ -1,5 +1,5 @@
 const s_pg = require("../services/postgres")
-
+const function_error = require('../utils/utils')
 
 
 let guardar_autor = async(req, res) => {
@@ -12,12 +12,7 @@ let guardar_autor = async(req, res) => {
             message: ' autor agregado ',
             autor: bd_res
         })
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    })
+    }).catch(function_error)
 
 
 }
@@ -30,12 +25,7 @@ let obtener_autores = async(req, res) => {
             message: ' exitoso ',
             autor: bd_res.rows
         });
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 }
 
 let obtener_autor = async(req, res) => {
@@ -47,12 +37,7 @@ let obtener_autor = async(req, res) => {
             message: ' autor agregado ',
             autor: bd_res.rows[0]
         })
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 
 }
 
@@ -68,12 +53,7 @@ let actualizar_autor = async(req, res) => {
             message: ' autor agregado ',
             autor: bd_res.rows[0]
         });
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 }
 
 let eliminar_autor = async(req, res) => {
@@ -85,12 +65,7 @@ let eliminar_autor = async(req, res) => {
             message: ' eliminado ',
             autor: bd_res
         });
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 
 
 }
