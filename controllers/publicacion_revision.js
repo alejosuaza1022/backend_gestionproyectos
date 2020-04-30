@@ -5,29 +5,39 @@ const s_pg = require("../services/postgres")
 let guardar_publicacion_revision = async(req, res) => {
     let servicio = new s_pg();
     let publicacion_revision = req.body;
-    let sql = 'insert into publicacionrevision(idpublicacion,data,fechasubida,estado)' +
-        'values($1,$2,$3,$4);'
-    await servicio.eje_sql(sql, [publicacion_revision.idpublicacion,
-        publicacion_revision.data, publicacion_revision.fechasubida,
-        publicacion_revision.estado
-    ]).
-    then(bd_res => {
-        res.status(200).send({
-            message: ' publicacion_revision agregado ',
-            publicacion_revision: bd_res
-        })
-    }).catch(error => {
+    verificar_revision(publicacion_revision.idpublicacion).then(bd_res => {
+        let resp = bd_res.rowCount
+        if (resp === 0) {
+            let sql = 'insert into publicacionrevision(idpublicacion,data,fechasubida,estado)' +
+                'values($1,$2,$3,$4);'
+            await servicio.eje_sql(sql, [publicacion_revision.idpublicacion,
+                publicacion_revision.data, publicacion_revision.fechasubida,
+                publicacion_revision.estado
+            ]).
+            then(bd_res => {
+                res.status(200).send({
+                    message: ' publicacion_revision agregado ',
+                    publicacion_revision: bd_res
+                })
+            }).catch(function_error)
+        } else {
+            res.send({ message: 'aún tiene una revisión pendiente', propuesta: bd_res.rows })
+        }
+    }).catch(function_error)
+}
+let function_error = error => {
         res.status(500).send({
             message: 'se detecto un error',
             error: error
         });
-    })
-
-
+    }
+    // para poder verificar que un autor no suba dos propuesta para revisar al mismo tiempo
+async function verificar_revision(idpublicacion) {
+    let servicio = new s_pg();
+    const estado = 0
+    let sql = 'select data,fechasubida,estado from publicacionrevision where id = $1 and estado =$2;'
+    return await servicio.eje_sql(sql, [idpublicacion, estado]);
 }
-
-
-
 
 let obtener_publicacion_revisiones = async(req, res) => {
     let servicio = new s_pg();
@@ -37,12 +47,7 @@ let obtener_publicacion_revisiones = async(req, res) => {
             message: ' exitoso ',
             publicacion_revision: bd_res.rows
         });
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 }
 
 let obtener_publicacion_revision = async(req, res) => {
@@ -54,12 +59,7 @@ let obtener_publicacion_revision = async(req, res) => {
             message: ' publicacion_revision agregada ',
             publicacion_revision: bd_res.rows[0]
         })
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 
 }
 
@@ -79,12 +79,7 @@ let actualizar_publicacion_revision = async(req, res) => {
             message: ' publicacion_revision agregado ',
             publicacion_revision: bd_res.rows[0]
         });
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 }
 
 let eliminar_publicacion_revision = async(req, res) => {
@@ -96,12 +91,7 @@ let eliminar_publicacion_revision = async(req, res) => {
             message: ' eliminado ',
             publicacion_revision: bd_res
         });
-    }).catch(error => {
-        res.status(500).send({
-            message: 'se detecto un error',
-            error: error
-        });
-    });
+    }).catch(function_error);
 
 
 }

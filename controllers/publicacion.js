@@ -21,7 +21,7 @@ let guardar_publicacion = async(req, res) => {
 
 
     }
-    // obtener todos las revisione que el autor ha subido para calificar 
+    // obtener todos las revisiones que el autor ha subido para calificar de una misma publicación
 let obtener_revisiones_publicacion = async(req, res) => {
     let servicio = new s_pg();
     let id_publicacion = req.params.id
