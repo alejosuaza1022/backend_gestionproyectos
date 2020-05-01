@@ -1,5 +1,5 @@
 const s_pg = require("../services/postgres")
-const function_error = require('../utils/utils')
+
 
 
 let guardar_autor = async(req, res) => {
@@ -12,7 +12,12 @@ let guardar_autor = async(req, res) => {
             message: ' autor agregado ',
             autor: bd_res
         })
-    }).catch(function_error)
+    }).catch(error => {
+        res.status(500).send({
+            message: 'se detecto un error',
+            error: error
+        })
+    })
 
 
 }
@@ -25,7 +30,12 @@ let obtener_autores = async(req, res) => {
             message: ' exitoso ',
             autor: bd_res.rows
         });
-    }).catch(function_error);
+    }).catch(error => {
+        res.status(500).send({
+            message: 'se detecto un error',
+            error: error
+        })
+    });
 }
 
 let obtener_autor = async(req, res) => {
@@ -37,7 +47,12 @@ let obtener_autor = async(req, res) => {
             message: ' autor agregado ',
             autor: bd_res.rows[0]
         })
-    }).catch(function_error);
+    }).catch(error => {
+        res.status(500).send({
+            message: 'se detecto un error',
+            error: error
+        })
+    });
 
 }
 
@@ -45,15 +60,20 @@ let actualizar_autor = async(req, res) => {
     let servicio = new s_pg();
     let autor = req.body;
     let id_autor = req.params.id;
-    let sql = 'update autor set nombre = $1' +
+    let sql = 'update autor set nombre = $1,' +
         'apellidos = $2 ,ocupacion = $3,idautor = $4 where idautor = $5;'
     await servicio.eje_sql(sql, [autor.nombre, autor.apellidos, autor.ocupacion, autor.idautor, id_autor]).
     then(bd_res => {
         res.status(200).send({
-            message: ' autor agregado ',
+            message: ' autor actualizado ',
             autor: bd_res.rows[0]
         });
-    }).catch(function_error);
+    }).catch(error => {
+        res.status(500).send({
+            message: 'se detecto un error',
+            error: error
+        })
+    });
 }
 
 let eliminar_autor = async(req, res) => {
@@ -65,8 +85,30 @@ let eliminar_autor = async(req, res) => {
             message: ' eliminado ',
             autor: bd_res
         });
-    }).catch(function_error);
+    }).catch(error => {
+        res.status(500).send({
+            message: 'se detecto un error',
+            error: error
+        })
+    });
 
+
+}
+let obtener_publicaciones_autor = async(req, res) => {
+    let servicio = new s_pg();
+    let id_autor = req.params.id
+    let sql = 'select id,nombre,materiaestudio from publicacion where idautor = $1;'
+    await servicio.eje_sql(sql, [id_autor]).then(bd_res => {
+        res.status(200).send({
+            message: ' exitoso ',
+            publicacion: bd_res.rows
+        });
+    }).catch(error => {
+        res.status(500).send({
+            message: 'se detecto un error',
+            error: error
+        })
+    });
 
 }
 
@@ -75,5 +117,6 @@ module.exports = {
     obtener_autor,
     obtener_autores,
     actualizar_autor,
-    eliminar_autor
+    eliminar_autor,
+    obtener_publicaciones_autor
 }

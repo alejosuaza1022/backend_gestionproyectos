@@ -1,36 +1,43 @@
 const s_pg = require("../services/postgres")
-const function_error = require('../utils/utils')
+
 
 
 let guardar_registro_evaluacion = async(req, res) => {
     let servicio = new s_pg();
     let registro_evaluacion = req.body;
     let sql = 'insert into registroevaluacion(fechaevaluacion,organizacion,estilo,temporalidad,' +
-        'aportesobras,resultadofinal,concepto,idevaluador,idpublicacionrevision)'
-    'values($1,$2,$3,$4,$5,$6,$7,$8,$9);'
+        'aportesobras,resultadofinal,concepto,idevaluador,idpublicacionrevision)' +
+        'values($1,$2,$3,$4,$5,$6,$7,$8,$9);'
     await servicio.eje_sql(sql, [registro_evaluacion.fechaevaluacion,
         registro_evaluacion.organizacion, registro_evaluacion.estilo,
         registro_evaluacion.temporalidad, registro_evaluacion.aportesobras,
         registro_evaluacion.resultadofinal, registro_evaluacion.concepto,
         registro_evaluacion.idevaluador, registro_evaluacion.idpublicacionrevision
     ]).
-    then(bd_res => {
-        actualizar_estado.then(bd_resp => {
+    then(async bd_res => {
+        try {
+            await actualizar_estado(registro_evaluacion.idpublicacionrevision);
             res.status(200).send({
                 message: ' registro_evaluacion agregado ',
-                actualizado: bd_resp,
                 registro_evaluacion: bd_res
             })
-        }).catch(function_error)
-    }).catch(function_error)
-
-
+        } catch (error) {
+            res.status(500).send({
+                message: 'se detecto un error',
+                error: error
+            })
+        }
+    }).catch(error => res.status(500).send({
+        message: 'se detecto un error',
+        error: error
+    }))
 }
-async function actualizar_estado(idpublicacionrevision) {
+
+function actualizar_estado(idpublicacionrevision) {
     let servicio = new s_pg();
     const estado = 1;
-    let sql = 'update publicacionrevision set estado = $1 where id = $5;';
-    return await servicio.eje_sql(sql, [estado, idpublicacionrevision])
+    let sql = 'update publicacionrevision set estado = $1 where id = $2;';
+    return servicio.eje_sql(sql, [estado, idpublicacionrevision])
 }
 
 let obtener_registro_evaluaciones = async(req, res) => {
@@ -41,7 +48,10 @@ let obtener_registro_evaluaciones = async(req, res) => {
             message: ' exitoso ',
             registro_evaluacion: bd_res.rows
         });
-    }).catch(function_error);
+    }).catch(error => res.status(500).send({
+        message: 'se detecto un error',
+        error: error
+    }));
 }
 
 let obtener_registro_evaluacion = async(req, res) => {
@@ -53,7 +63,10 @@ let obtener_registro_evaluacion = async(req, res) => {
             message: ' registro_evaluacion agregada ',
             registro_evaluacion: bd_res.rows[0]
         })
-    }).catch(function_error);
+    }).catch(error => eres.status(500).send({
+        message: 'se detecto un error',
+        error: error
+    }));
 
 }
 
@@ -75,7 +88,10 @@ let actualizar_registro_evaluacion = async(req, res) => {
             message: ' registro_evaluacion agregado ',
             registro_evaluacion: bd_res.rows[0]
         });
-    }).catch(function_error);
+    }).catch(error => res.status(500).send({
+        message: 'se detecto un error',
+        error: error
+    }));
 }
 
 let eliminar_registro_evaluacion = async(req, res) => {
@@ -87,7 +103,10 @@ let eliminar_registro_evaluacion = async(req, res) => {
             message: ' eliminado ',
             registro_evaluacion: bd_res
         });
-    }).catch(function_error);
+    }).catch(error => res.status(500).send({
+        message: 'se detecto un error',
+        error: error
+    }));
 
 
 }

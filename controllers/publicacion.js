@@ -1,5 +1,5 @@
 const s_pg = require("../services/postgres")
-const function_error = require('../utils/utils')
+
 
 
 let guardar_publicacion = async(req, res) => {
@@ -31,20 +31,14 @@ let obtener_revisiones_publicacion = async(req, res) => {
             message: ' exitoso ',
             publicacion_revision: bd_res.rows
         });
-    }).catch(function_error);
+    }).catch(error => {
+        res.status(500).send({
+            message: 'se detecto un error',
+            error: error
+        })
+    });
 }
-let obtener_publicaciones_autor = async(req, res) => {
-    let servicio = new s_pg();
-    let id_autor = req.params.id_autor
-    let sql = 'select id,nombre,materiaestudio from publicacion where idautor = $1;'
-    await servicio.eje_sql(sql, [id_autor]).then(bd_res => {
-        res.status(200).send({
-            message: ' exitoso ',
-            publicacion: bd_res.rows
-        });
-    }).catch(function_error);
 
-}
 let obtener_publicaciones = async(req, res) => {
     let servicio = new s_pg();
     let sql = 'select id,nombre,materiaestudio,idautor from publicacion;'
@@ -53,7 +47,12 @@ let obtener_publicaciones = async(req, res) => {
             message: ' exitoso ',
             publicacion: bd_res.rows
         });
-    }).catch(function_error);
+    }).catch(error => {
+        res.status(500).send({
+            message: 'se detecto un error',
+            error: error
+        })
+    });
 }
 
 let obtener_publicacion = async(req, res) => {
@@ -62,10 +61,15 @@ let obtener_publicacion = async(req, res) => {
     let sql = 'select nombre,materiaestudio,idautor from publicacion where id = $1;'
     await servicio.eje_sql(sql, [id_publicacion]).then(bd_res => {
         res.status(200).send({
-            message: ' publicacion agregada ',
+            message: ' exitoso ',
             publicacion: bd_res.rows[0]
         })
-    }).catch(function_error);
+    }).catch(error => {
+        res.status(500).send({
+            message: 'se detecto un error',
+            error: error
+        })
+    });
 
 }
 
@@ -73,15 +77,20 @@ let actualizar_publicacion = async(req, res) => {
     let servicio = new s_pg();
     let publicacion = req.body;
     let id_publicacion = req.params.id;
-    let sql = 'update publicacion set nombre = $1' +
+    let sql = 'update publicacion set nombre = $1,' +
         'materiaestudio = $2, idautor=$3 where id = $4;'
     await servicio.eje_sql(sql, [publicacion.nombre, publicacion.materia_estudio, publicacion.idautor, id_publicacion]).
     then(bd_res => {
         res.status(200).send({
-            message: ' publicacion agregado ',
+            message: ' publicacion actualizada ',
             publicacion: bd_res.rows[0]
         });
-    }).catch(function_error);
+    }).catch(error => {
+        res.status(500).send({
+            message: 'se detecto un error',
+            error: error
+        })
+    });
 }
 
 let eliminar_publicacion = async(req, res) => {
@@ -93,7 +102,12 @@ let eliminar_publicacion = async(req, res) => {
             message: ' eliminado ',
             publicacion: bd_res
         });
-    }).catch(function_error);
+    }).catch(error => {
+        res.status(500).send({
+            message: 'se detecto un error',
+            error: error
+        })
+    });
 
 
 }
@@ -105,5 +119,4 @@ module.exports = {
     actualizar_publicacion,
     eliminar_publicacion,
     obtener_revisiones_publicacion,
-    obtener_publicaciones_autor
 }
