@@ -5,9 +5,9 @@ const autenticacion = require('..//controllers/autenticacion')
 
 
 router.post("/login", autenticacion.validar_evaluador);
+router.post('/', controlador_eval.guardar_evaluador);
 router.use(autenticacion.middleware_validar_evaluador)
 router.get('/', controlador_eval.obtener_evaluadores);
-router.post('/', controlador_eval.guardar_evaluador);
 router.get('/propuestas_dis', controlador_eval.obtener_propuestas_disponibles);
 router.get('/:id', controlador_eval.obtener_evaluador);
 router.delete('/:id', controlador_eval.eliminar_evaluador);

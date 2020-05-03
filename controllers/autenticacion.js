@@ -42,8 +42,11 @@ class _Autenticacion {
      */
     async consultarPersona() {
         let _servicio = new s_pg();
-        let valores = [this.persona.idautor, this.persona.clave];
+        let valores = [this.persona.idevaluador, this.persona.clave];
+        if (this.tipo === 'autor') valores = [this.persona.idautor, this.persona.clave];
+
         let sql = `SELECT * FROM ${this.tipo} WHERE id${this.tipo}=$1 AND clave=md5($2)`;
+        console.log(sql)
         return await _servicio.eje_sql(sql, valores);
     };
 
@@ -65,6 +68,7 @@ let validar_autor = async(req, res) => {
         autenticacion.validarLogin()
         autenticacion.consultarPersona().
         then(bd_res => {
+
             let persona =
                 bd_res.rowCount > 0 ? bd_res.rows[0] : undefined;
             if (persona) {
@@ -95,6 +99,8 @@ let validar_evaluador = async(req, res) => {
         then(bd_res => {
             let persona =
                 bd_res.rowCount > 0 ? bd_res.rows[0] : undefined;
+            console.log(persona)
+
             if (persona) {
                 let token = autenticacion.generarToken(persona);
                 res

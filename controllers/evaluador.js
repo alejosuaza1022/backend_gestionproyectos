@@ -7,7 +7,7 @@ let guardar_evaluador = async(req, res) => {
     let evaluador = req.body;
     let sql = 'insert into evaluador(nombre,apellidos,idevaluador,afiliacion,cargo,clave) values($1,$2,$3,$4,$5,md5($6));'
     await servicio.eje_sql(sql, [evaluador.nombre, evaluador.apellidos,
-        evaluador.idevaluador, evaluador.afiliacion, evaluador.cargo
+        evaluador.idevaluador, evaluador.afiliacion, evaluador.cargo, evaluador.clave
     ]).
     then(bd_res => {
         res.status(200).send({
@@ -43,8 +43,7 @@ let obtener_evaluador = async(req, res) => {
     await servicio.eje_sql(sql, [id_evaluador]).then(bd_res => {
         message = bd_res.rowCount === 0 ? 'no hay coincidencias' : 'exitoso';
         res.status(200).send({
-
-            message: messages,
+            message: message,
             evaluador: bd_res.rows[0]
         })
     }).catch(error => res.status(500).send({
