@@ -127,10 +127,30 @@ let eliminar_publicacion_revision = async(req, res) => {
 
 }
 
+let middle_verificar_fecha = async(req, res, next) => {
+    let servicio = new s_pg();
+    let fechasubida = req.body.fechasubida;
+    let sql = "select fechaevaluacion+interval '15 days' >= $1 as plazo_maximo from registroevaluacion" +
+        " inner join publicacionrevision on idpublicacionrevision = " +
+        "publicacionrevision.id where idpublicacion = $2 order by fechaevaluacion desc "
+    await servicio.eje_sql(sql, [fechasubida, req.body.idpublicacion]).
+    then(bd_res => {
+        let bool = bd_res.rows[0].plazo_maximo;
+        console.log(bool)
+        if (bool) next();
+        else res.send("fecha exede el plazo limite");
+
+    }).catch(error => {
+        res.send(error)
+    });
+
+}
+
 module.exports = {
     guardar_publicacion_revision,
     obtener_publicacion_revision,
     obtener_publicacion_revisiones,
     actualizar_publicacion_revision,
-    eliminar_publicacion_revision
+    eliminar_publicacion_revision,
+    middle_verificar_fecha
 }
