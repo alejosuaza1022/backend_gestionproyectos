@@ -5,11 +5,11 @@ const s_pg = require("../services/postgres")
 let guardar_autor = async(req, res) => {
     let servicio = new s_pg();
     let autor = req.body;
-    let sql = 'insert into autor(nombre,apellidos,ocupacion,idautor) values($1,$2,$3,$4);'
-    await servicio.eje_sql(sql, [autor.nombre, autor.apellidos, autor.ocupacion, autor.idautor]).
+    let sql = 'insert into autor(nombre,apellidos,ocupacion,idautor,clave) values($1,$2,$3,$4,md5($5));'
+    await servicio.eje_sql(sql, [autor.nombre, autor.apellidos, autor.ocupacion, autor.idautor, autor.clave]).
     then(bd_res => {
         res.status(200).send({
-            message: ' autor agregado ',
+            message: ' exitoso ',
             autor: bd_res
         })
     }).catch(error => {

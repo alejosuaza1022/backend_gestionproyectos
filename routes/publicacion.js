@@ -2,7 +2,6 @@ const express = require('express')
 const router = express.Router()
 const controlador_publicacion = require('../controllers/publicacion')
 
-
 router.get('/', controlador_publicacion.obtener_publicaciones);
 router.post('/', controlador_publicacion.guardar_publicacion);
 router.get('/:id', controlador_publicacion.obtener_publicacion);

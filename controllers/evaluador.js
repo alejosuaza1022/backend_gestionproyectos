@@ -5,7 +5,7 @@ const s_pg = require("../services/postgres")
 let guardar_evaluador = async(req, res) => {
     let servicio = new s_pg();
     let evaluador = req.body;
-    let sql = 'insert into evaluador(nombre,apellidos,idevaluador,afiliacion,cargo) values($1,$2,$3,$4,$5);'
+    let sql = 'insert into evaluador(nombre,apellidos,idevaluador,afiliacion,cargo,clave) values($1,$2,$3,$4,$5,md5($6));'
     await servicio.eje_sql(sql, [evaluador.nombre, evaluador.apellidos,
         evaluador.idevaluador, evaluador.afiliacion, evaluador.cargo
     ]).
