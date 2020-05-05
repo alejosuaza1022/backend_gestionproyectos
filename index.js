@@ -23,12 +23,7 @@ app.use('/api/evaluador', eval_rutas)
 const registro_evaluacion = require('./routes/registro_evaluacion')
 app.use('/api/registro_eval', registro_evaluacion)
 
-app.use("/", (req, res) => {
-    res.status(404).send({
-        ok: false,
-        mensaje: "El recurso que busca no existe.",
-    });
-});
+
 
 
 app.listen(process.env.PORT, () => {

@@ -5,8 +5,12 @@ let guardar_publicacion_revision = async(req, res) => {
         let servicio = new s_pg();
         let publicacion_revision = req.body;
         try {
-            let resp = (await verificar_revision(publicacion_revision.idpublicacion)).rowCount
-            if (resp === 0) {
+            let resp = (await middle_verificar_fecha(publicacion_revision.fechasubida, publicacion_revision.idpublicacion))
+            let bool = true;
+            if (resp.rowCount !== 0) {
+                bool = resp.rows[0].plazo_maximo;
+            }
+            if (bool) {
                 _guardar(publicacion_revision, servicio).then(async bd_res => {
                         res.send({
                             data: bd_res,
@@ -19,11 +23,7 @@ let guardar_publicacion_revision = async(req, res) => {
                             error: error
                         }))
             } else {
-
-                res.send({
-                    message: 'aún tiene una revisión pendiente',
-
-                })
+                res.send({ message: "fecha exede el plazo limite" });
 
             }
         } catch (error) {
@@ -36,11 +36,25 @@ let guardar_publicacion_revision = async(req, res) => {
     }
     // para poder verificar que un autor no suba dos propuesta para revisar al mismo tiempo, solo una 
     // en proceso de revisión
-function verificar_revision(idpublicacion) {
+let verificar_revision = async(req, res, next) => {
     let servicio = new s_pg();
+    let idpublicacion = req.body.idpublicacion
     const estado = 0
-    let sql = 'select data,fechasubida,estado from publicacionrevision where idpublicacion = $1 and estado =$2;'
-    return servicio.eje_sql(sql, [idpublicacion, estado]);
+    let sql = 'select data,fechasubida,estado from publicacionrevision where idpublicacion = $1 and (estado =$2 or estado = 2);'
+    servicio.eje_sql(sql, [idpublicacion, estado]).then(bd_res => {
+        console.log(bd_res.rowCount);
+        if (bd_res.rowCount === 0) {
+            next();
+            return;
+        } else res.send({
+            message: 'aún tiene una revisión pendiente'
+        });
+
+    }).catch(error => {
+        res.send({
+            error: error,
+        })
+    });
 }
 
 async function _guardar(publicacion_revision, servicio) {
@@ -128,31 +142,29 @@ let eliminar_publicacion_revision = async(req, res) => {
 
 
 }
-
-let middle_verificar_fecha = async(req, res, next) => {
+async function middle_verificar_fecha(fechasubida, idpublicacion) {
     let servicio = new s_pg();
-    let fechasubida = req.body.fechasubida;
-    let sql = "select fechaevaluacion+interval '15 days' >= $1 as plazo_maximo from registroevaluacion" +
+    let sql = "select fechaevaluacion+interval '15 days' >= $1 and $1>fechaevaluacion as plazo_maximo from registroevaluacion" +
         " inner join publicacionrevision on idpublicacionrevision = " +
         "publicacionrevision.id where idpublicacion = $2 order by fechaevaluacion desc "
-    await servicio.eje_sql(sql, [fechasubida, req.body.idpublicacion]).
-    then(bd_res => {
-        console.log(bd_res.rowCount);
-        if (bd_res.rowCount === 0) {
-            next();
-            return;
-        }
-        let bool = bd_res.rows[0].plazo_maximo;
+    return await servicio.eje_sql(sql, [fechasubida, idpublicacion]);
+    /**  then(bd_res => {
+         console.log(bd_res.rowCount);
+         if (bd_res.rowCount === 0) {
+             next();
+             return;
+         }
+         let bool = bd_res.rows[0].plazo_maximo;
 
-        if (bool) next();
-        else res.send("fecha exede el plazo limite");
+         if (bool) next();
+         else res.send("fecha exede el plazo limite");
 
-    }).catch(error => {
-        res.send({
-            error: error,
-            efe: "lalksdj"
-        })
-    });
+     }).catch(error => {
+         res.send({
+             error: error,
+             efe: "lalksdj"
+         })
+     });*/
 
 }
 
@@ -162,5 +174,5 @@ module.exports = {
     obtener_publicacion_revisiones,
     actualizar_publicacion_revision,
     eliminar_publicacion_revision,
-    middle_verificar_fecha
+    verificar_revision
 }

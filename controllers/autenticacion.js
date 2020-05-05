@@ -157,10 +157,31 @@ let middleware_validar_evaluador = (req, res, next) => {
         });
     }
 }
+let verificarAut = (req, res) => {
+    try {
+        let tipo = req.query
+        console.log(tipo['tipo'])
+        let token = req.headers.token;
+        let autenticacion = new _Autenticacion(req.body, tipo['tipo']);
+        let verificacion = autenticacion.verificarToken(token);
+        res.status(200).send({
+            ok: true,
+            info: verificacion,
+            mensaje: "Autenticado.",
+        });
+    } catch (error) {
+        res.status(401).send({
+            ok: false,
+            info: error,
+            mensaje: "No autenticado.",
+        });
+    }
+}
 
 module.exports = {
     validar_autor,
     validar_evaluador,
     middleware_validar_autor,
-    middleware_validar_evaluador
+    middleware_validar_evaluador,
+    verificarAut
 }
