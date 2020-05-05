@@ -22,6 +22,10 @@ let guardar_autor = async(req, res) => {
 
 }
 
+let obtener_estado_publicacion = async(req, res) => {
+
+}
+
 let obtener_autores = async(req, res) => {
     let servicio = new s_pg();
     let sql = 'select nombre,apellidos,ocupacion,idautor from autor;'

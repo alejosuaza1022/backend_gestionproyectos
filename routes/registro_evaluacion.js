@@ -1,8 +1,9 @@
 const express = require('express')
 const router = express.Router()
 const controlador_reg_pub = require('../controllers/registro_evaluacion')
+const autenticacion = require('..//controllers/autenticacion')
 
-
+router.use(autenticacion.middleware_validar_evaluador)
 router.get('/', controlador_reg_pub.obtener_registro_evaluaciones);
 router.post('/', controlador_reg_pub.guardar_registro_evaluacion);
 router.get('/:id', controlador_reg_pub.obtener_registro_evaluacion);

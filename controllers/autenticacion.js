@@ -44,9 +44,7 @@ class _Autenticacion {
         let _servicio = new s_pg();
         let valores = [this.persona.idevaluador, this.persona.clave];
         if (this.tipo === 'autor') valores = [this.persona.idautor, this.persona.clave];
-
         let sql = `SELECT * FROM ${this.tipo} WHERE id${this.tipo}=$1 AND clave=md5($2)`;
-        console.log(sql)
         return await _servicio.eje_sql(sql, valores);
     };
 
@@ -107,11 +105,11 @@ let validar_evaluador = async(req, res) => {
                     .status(200)
                     .send({
                         info: token,
+                        nombre: persona.nombre,
                         mensaje: "evaluador autenticado."
                     });
             } else {
                 res.status(400).send({
-                    info: {},
                     mensaje: "Documento y/o clave incorrecta.",
                 });
             }
@@ -122,7 +120,6 @@ let validar_evaluador = async(req, res) => {
 
 }
 let middleware_validar_autor = (req, res, next) => {
-    console.log("hola")
     let autenticacion = new _Autenticacion(req.body, "autor");
     try {
         let url = req.url;

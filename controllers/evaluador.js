@@ -91,12 +91,11 @@ let eliminar_evaluador = async(req, res) => {
 
 
 }
-let obtener_propuestas_disponibles = async(req, res) => {
+let obtener_propuestas_en_revision = async(req, res) => {
     let servicio = new s_pg();
     const estado = 0;
-    let sql = 'select idpublicacion,data,fechasubida,nombre,materiaestudio from ' +
-        ' publicacion inner join publicacionrevision on publicacion.id = publicacionrevision.idpublicacion' +
-        ' and estado = $1;';
+    let sql = 'select publicacionrevision.idpublicacion,fechasubida,data,materiaestudio,nombre from publicacionrevision inner join  (select distinct on(idpublicacion) idpublicacion from registroevaluacion inner join publicacionrevision on idpublicacionrevision = publicacionrevision.id where idevaluador = $1)as tabaux on tabaux.idpublicacion = publicacionrevision.idpublicacion inner join publicacion on publicacion.id = publicacionrevision.idpublicacion where estado = 0;'
+
     await servicio.eje_sql(sql, [estado]).then(bd_res => res.status(200).send({
         message: ' exitoso ',
         evaluador: bd_res.rows
@@ -104,6 +103,11 @@ let obtener_propuestas_disponibles = async(req, res) => {
         message: 'se detecto un error',
         error: error
     }))
+}
+let obtener_propuestas_nuevas = async(req, res) => {
+    let servicio = new s_pg();
+    let sql = 'select data,nombre,materiaestudio,fechasubida from publicacionrevision inner join publicacion on idpublicacion = publicacion.id inner join (select idpublicacion as id2 from publicacionrevision inner join publicacion on publicacion.id = idpublicacion group by idpublicacion having count(idpublicacion) = 1)as tbaux on idpublicacion = id2 where estado = 0;'
+
 
 
 
@@ -115,5 +119,6 @@ module.exports = {
     obtener_evaluadores,
     actualizar_evaluador,
     eliminar_evaluador,
-    obtener_propuestas_disponibles
+    obtener_propuestas_en_revision,
+    obtener_propuestas_nuevas
 }

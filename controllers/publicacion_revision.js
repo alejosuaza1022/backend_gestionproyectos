@@ -1,6 +1,7 @@
 const s_pg = require("../services/postgres")
 
 let guardar_publicacion_revision = async(req, res) => {
+        console.log("asdasd")
         let servicio = new s_pg();
         let publicacion_revision = req.body;
         try {
@@ -18,6 +19,7 @@ let guardar_publicacion_revision = async(req, res) => {
                             error: error
                         }))
             } else {
+
                 res.send({
                     message: 'aún tiene una revisión pendiente',
 
@@ -135,13 +137,21 @@ let middle_verificar_fecha = async(req, res, next) => {
         "publicacionrevision.id where idpublicacion = $2 order by fechaevaluacion desc "
     await servicio.eje_sql(sql, [fechasubida, req.body.idpublicacion]).
     then(bd_res => {
+        console.log(bd_res.rowCount);
+        if (bd_res.rowCount === 0) {
+            next();
+            return;
+        }
         let bool = bd_res.rows[0].plazo_maximo;
-        console.log(bool)
+
         if (bool) next();
         else res.send("fecha exede el plazo limite");
 
     }).catch(error => {
-        res.send(error)
+        res.send({
+            error: error,
+            efe: "lalksdj"
+        })
     });
 
 }

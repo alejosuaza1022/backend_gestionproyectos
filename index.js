@@ -1,9 +1,11 @@
 const express = require("express");
 const morgan = require('morgan')
+var cors = require('cors')
 require('dotenv').config()
 
 
 const app = express();
+app.use(cors())
 app.use(express.json());
 app.use(morgan('dev'))
 const autor_rutas = require('./routes/autor')
@@ -20,6 +22,14 @@ app.use('/api/evaluador', eval_rutas)
 
 const registro_evaluacion = require('./routes/registro_evaluacion')
 app.use('/api/registro_eval', registro_evaluacion)
+
+app.use("/", (req, res) => {
+    res.status(404).send({
+        ok: false,
+        mensaje: "El recurso que busca no existe.",
+    });
+});
+
 
 app.listen(process.env.PORT, () => {
     console.log(process.env.PORT);
