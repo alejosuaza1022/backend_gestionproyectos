@@ -177,7 +177,6 @@ let verificarAut = (req, res) => {
         });
     }
 }
-
 module.exports = {
     validar_autor,
     validar_evaluador,

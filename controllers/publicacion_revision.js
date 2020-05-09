@@ -100,6 +100,7 @@ let obtener_publicacion_revision = async(req, res) => {
 
 }
 
+
 let actualizar_publicacion_revision = async(req, res) => {
     let servicio = new s_pg();
     let publicacion_revision = req.body;
@@ -139,8 +140,6 @@ let eliminar_publicacion_revision = async(req, res) => {
             error: error
         })
     });
-
-
 }
 async function middle_verificar_fecha(fechasubida, idpublicacion) {
     let servicio = new s_pg();
