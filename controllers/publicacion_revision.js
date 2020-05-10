@@ -1,7 +1,9 @@
 const s_pg = require("../services/postgres")
 
+/// validar fecha de realización de una correción también que sea mayor a la fecha de subida
+
+
 let guardar_publicacion_revision = async(req, res) => {
-        console.log("asdasd")
         let servicio = new s_pg();
         let publicacion_revision = req.body;
         try {
@@ -39,36 +41,35 @@ let guardar_publicacion_revision = async(req, res) => {
 let verificar_revision = async(req, res, next) => {
     let servicio = new s_pg();
     let idpublicacion = req.body.idpublicacion
-    const estado = 0
-    let sql = 'select data,fechasubida,estado from publicacionrevision where idpublicacion = $1 and (estado =$2 or estado = 2);'
-    servicio.eje_sql(sql, [idpublicacion, estado]).then(bd_res => {
-        console.log(bd_res.rowCount);
+    let sql = 'select id from pu_publicacion_revision where id_publicacion =$1 and (estado = 0 or estado =2 );'
+    servicio.eje_sql(sql, [idpublicacion]).then(bd_res => {
+        console.log("AQUI", bd_res.rowCount);
         if (bd_res.rowCount === 0) {
             next();
             return;
         } else res.send({
-            message: 'aún tiene una revisión pendiente'
+            message: 'aún tiene una revisión pendiente o su evaluación ya fue realizada'
         });
-
     }).catch(error => {
         res.send({
             error: error,
+            message: "error"
         })
     });
 }
 
 async function _guardar(publicacion_revision, servicio) {
-    let sql = 'insert into publicacionrevision(idpublicacion,data,fechasubida,estado)' +
-        'values($1,$2,$3,$4);'
+
+    let sql = 'insert into pu_publicacion_revision(id_publicacion,archivo,id_evaluador,estado,fecha_subida)' +
+        'values($1,$2,$3,$4,$5);'
     return await servicio.eje_sql(sql, [publicacion_revision.idpublicacion,
-        publicacion_revision.data, publicacion_revision.fechasubida,
-        publicacion_revision.estado
+        publicacion_revision.archivo, publicacion_revision.idevaluador, 0, publicacion_revision.fechasubida
     ])
 }
 
 let obtener_publicacion_revisiones = async(req, res) => {
     let servicio = new s_pg();
-    let sql = 'select id,idpublicacion,data,fechasubida,estado from publicacionrevision;'
+    let sql = 'select  id,retroalimentacion,fecha_realizada,id_publicacion,archivo,estado from pu_publicacion_revision;'
     await servicio.eje_sql(sql).then(bd_res => {
         res.status(200).send({
             message: ' exitoso ',
@@ -85,10 +86,10 @@ let obtener_publicacion_revisiones = async(req, res) => {
 let obtener_publicacion_revision = async(req, res) => {
     let servicio = new s_pg();
     let id_publicacion_revision = req.params.id;
-    let sql = 'select idpublicacion,data,fechasubida,estado from publicacionrevision where id = $1;'
+    let sql = 'select id,retroalimentacion,fecha_realizada,id_publicacion,archivo,estado from pu_publicacion_revision where id = $1;'
     await servicio.eje_sql(sql, [id_publicacion_revision]).then(bd_res => {
         res.status(200).send({
-            message: ' publicacion_revision agregada ',
+            message: ' exitoso ',
             publicacion_revision: bd_res.rows[0]
         })
     }).catch(error => {
@@ -101,15 +102,13 @@ let obtener_publicacion_revision = async(req, res) => {
 }
 
 
-let actualizar_publicacion_revision = async(req, res) => {
+let actualizar_publicacion_revision_autor = async(req, res) => {
     let servicio = new s_pg();
     let publicacion_revision = req.body;
     let id_publicacion_revision = req.params.id;
-    let sql = 'update publicacionrevision set idpublicacion = $1,' +
-        'data = $2, fechasubida=$3, estado = $4 where id = $5;'
-    await servicio.eje_sql(sql, [publicacion_revision.idpublicacion,
-        publicacion_revision.data, publicacion_revision.fechasubida,
-        publicacion_revision.estado,
+    let sql = 'update pu_publicacion_revision set archivo = $1,' +
+        'where id = $2;'
+    await servicio.eje_sql(sql, [publicacion_revision.archivo,
         id_publicacion_revision
     ]).
     then(bd_res => {
@@ -117,6 +116,29 @@ let actualizar_publicacion_revision = async(req, res) => {
             message: ' publicacion_revision actualizado ',
             publicacion_revision: bd_res.rows[0]
         });
+    }).catch(error => {
+        res.status(500).send({
+            message: 'se detecto un error',
+            error: error
+        })
+    });
+}
+let actualizar_publicacion_revision = async(req, res) => {
+    let servicio = new s_pg();
+    let publicacion_revision = req.body;
+    let id_publicacion_revision = req.params.id;
+    let sql = 'update pu_publicacion_revision set retroalimentacion = $1,' +
+        'fecha_realizada=$2,estado = 1 where id = $3;'
+    await servicio.eje_sql(sql, [publicacion_revision.retroalimentacion, publicacion_revision.fecha_realizada,
+        id_publicacion_revision
+    ]).
+    then(async bd_res => {
+
+        res.status(200).send({
+            message: ' publicacion_revision actualizado ',
+            publicacion_revision: bd_res.rows[0]
+        });
+
     }).catch(error => {
         res.status(500).send({
             message: 'se detecto un error',
@@ -143,9 +165,7 @@ let eliminar_publicacion_revision = async(req, res) => {
 }
 async function middle_verificar_fecha(fechasubida, idpublicacion) {
     let servicio = new s_pg();
-    let sql = "select fechaevaluacion+interval '15 days' >= $1 and $1>fechaevaluacion as plazo_maximo from registroevaluacion" +
-        " inner join publicacionrevision on idpublicacionrevision = " +
-        "publicacionrevision.id where idpublicacion = $2 order by fechaevaluacion desc "
+    let sql = 'select fecha_realizada + 15 >= $1 and $1 >= fecha_realizada as plazo_maximo from pu_publicacion_revision where id_publicacion = $2 and estado = 1 order by fecha_realizada desc;'
     return await servicio.eje_sql(sql, [fechasubida, idpublicacion]);
     /**  then(bd_res => {
          console.log(bd_res.rowCount);

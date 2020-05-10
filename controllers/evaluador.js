@@ -5,10 +5,8 @@ const s_pg = require("../services/postgres")
 let guardar_evaluador = async(req, res) => {
     let servicio = new s_pg();
     let evaluador = req.body;
-    let sql = 'insert into evaluador(nombre,apellidos,idevaluador,afiliacion,cargo,clave) values($1,$2,$3,$4,$5,md5($6));'
-    await servicio.eje_sql(sql, [evaluador.nombre, evaluador.apellidos,
-        evaluador.idevaluador, evaluador.afiliacion, evaluador.cargo, evaluador.clave
-    ]).
+    let sql = 'insert into acc_usuarios (id,nombre,apellidos,correo,ocupacion,clave,afiliacion_institucional,rol) values($1,$2,$3,$4,$5,md5($6),$7,$8);'
+    await servicio.eje_sql(sql, [evaluador.idevaluador, evaluador.nombre, evaluador.apellidos, evaluador.correo, evaluador.cargo, evaluador.clave, evaluador.afiliacion, 1]).
     then(bd_res => {
         res.status(200).send({
             message: ' evaluador agregado ',
@@ -24,7 +22,7 @@ let guardar_evaluador = async(req, res) => {
 
 let obtener_evaluadores = async(req, res) => {
     let servicio = new s_pg();
-    let sql = 'select nombre,apellidos,idevaluador,afiliacion,cargo from evaluador;'
+    let sql = 'select id,nombre,apellidos,afiliacion_institucional,ocupacion,correo from acc_usuarios;'
     await servicio.eje_sql(sql).then(bd_res => {
         res.status(200).send({
             message: ' exitoso ',
@@ -39,7 +37,7 @@ let obtener_evaluadores = async(req, res) => {
 let obtener_evaluador = async(req, res) => {
     let servicio = new s_pg();
     let id_evaluador = req.params.id;
-    let sql = 'select nombre,apellidos,idevaluador,afiliacion,cargo  from evaluador where idevaluador = $1;'
+    let sql = 'select id,nombre,apellidos,afiliacion_institucional,ocupacion,correo  from acc_usuarios where id = $1;'
     await servicio.eje_sql(sql, [id_evaluador]).then(bd_res => {
         message = bd_res.rowCount === 0 ? 'no hay coincidencias' : 'exitoso';
         res.status(200).send({
@@ -57,12 +55,12 @@ let actualizar_evaluador = async(req, res) => {
     let servicio = new s_pg();
     let evaluador = req.body;
     let id_evaluador = req.params.id;
-    let sql = 'update evaluador set nombre = $1,' +
-        'apellidos = $2 ,idevaluador = $3 , afiliacion = $4, ' +
-        'cargo = $5 where idevaluador = $6;'
+    let sql = 'update acc_usuarios set nombre = $1,' +
+        'apellidos = $2 ,idevaluador = $3 , afiliacion_institucional = $4, ' +
+        'ocupacion = $5, correo = $6 where id = $5;'
     await servicio.eje_sql(sql, [evaluador.nombre, evaluador.apellidos,
         evaluador.idevaluador, evaluador.afiliacion,
-        evaluador.cargo, id_evaluador
+        evaluador.cargo, id_evaluador, evaluador.correo
     ]).
     then(bd_res => {
         res.status(200).send({
@@ -78,7 +76,7 @@ let actualizar_evaluador = async(req, res) => {
 let eliminar_evaluador = async(req, res) => {
     let servicio = new s_pg();
     let id_evaluador = req.params.id
-    let sql = 'delete from evaluador where idevaluador = $1 ;'
+    let sql = 'delete from acc_usuarios where id = $1 ;'
     await servicio.eje_sql(sql, [id_evaluador]).then(bd_res => {
         res.status(200).send({
             message: ' eliminado ',
@@ -92,7 +90,7 @@ let eliminar_evaluador = async(req, res) => {
 
 }
 
-let obtener_propuestas_en_revision = async(req, res) => {
+/*let obtener_propuestas_en_revision = async(req, res) => {
     let servicio = new s_pg();
     let id_evaluador = req.params.id;
     let sql = 'select publicacionrevision.id,fechasubida,data,materiaestudio,nombre from publicacionrevision inner join  (select distinct on(idpublicacion) idpublicacion from registroevaluacion inner join publicacionrevision on idpublicacionrevision = publicacionrevision.id where idevaluador = $1)as tabaux on tabaux.idpublicacion = publicacionrevision.idpublicacion inner join publicacion on publicacion.id = publicacionrevision.idpublicacion where estado = 0;'
@@ -106,11 +104,12 @@ let obtener_propuestas_en_revision = async(req, res) => {
     }))
 
 
-}
+}*/
 
+// no olvidar agregar el archivo
 let obtener_propuestas_nuevas = async(req, res) => {
     let servicio = new s_pg();
-    let sql = 'select publicacionrevision.id,data,nombre,materiaestudio,fechasubida from publicacionrevision inner join publicacion on idpublicacion = publicacion.id inner join (select idpublicacion as id2 from publicacionrevision inner join publicacion on publicacion.id = idpublicacion group by idpublicacion having count(idpublicacion) = 1)as tbaux on idpublicacion = id2 where estado = 0;'
+    let sql = 'select titulo,pu_propuestas_publicaciones.id,area,facultad,tipo_publicacion,archivo from pu_propuestas_publicaciones left  join pu_publicacion_revision on pu_propuestas_publicaciones.id = id_publicacion where pu_publicacion_revision.id is null;'
     await servicio.eje_sql(sql).then(bd_res => {
 
         res.status(200).send({
@@ -126,7 +125,7 @@ let obtener_propuestas_nuevas = async(req, res) => {
 let obtener_en_espera_evaluar = async(req, res) => {
     let servicio = new s_pg();
     let id_evaluador = req.params.id
-    let sql = 'select distinct on (idpublicacion) idpublicacion,idpublicacionrevision,registroevaluacion.id,data,fechasubida,nombre,materiaestudio from publicacionrevision inner join registroevaluacion on publicacionrevision.id = idpublicacionrevision inner join publicacion on publicacion.id = idpublicacion where idevaluador = $1 and estado = 2;'
+    let sql = ' select pu_publicacion_revision.id,pu_propuestas_publicaciones.id as idpub,titulo,area,facultad,tipo_publicacion,archivo from pu_propuestas_publicaciones inner join pu_publicacion_revision on pu_propuestas_publicaciones.id = id_publicacion where estado = 0 and id_evaluador = $1;'
     await servicio.eje_sql(sql, [id_evaluador]).then(bd_res => {
         res.status(200).send({
             publicaciones: bd_res.rows,
@@ -161,7 +160,6 @@ module.exports = {
     obtener_evaluadores,
     actualizar_evaluador,
     eliminar_evaluador,
-    obtener_propuestas_en_revision,
     obtener_propuestas_nuevas,
     obtener_en_espera_evaluar,
     obtener_evaluadas
