@@ -10,7 +10,7 @@ function validarLogin(persona) {
         };
     }
 
-    if (!persona.idevaluador) {
+    if (!persona.id) {
         throw {
             ok: false,
             mensaje: "El documento  es obligatorio."
@@ -31,7 +31,7 @@ function validarLogin(persona) {
  */
 async function consultarPersona(persona) {
     let _servicio = new s_pg();
-    let valores = [persona.idevaluador, persona.clave];
+    let valores = [persona.id, persona.clave];
     let sql = `SELECT * FROM acc_usuarios WHERE id=$1 AND clave=md5($2)`;
     return await _servicio.eje_sql(sql, valores);
 };

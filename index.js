@@ -7,6 +7,11 @@ require('dotenv').config()
 const app = express();
 app.use(cors())
 app.use(express.json());
+const fileupload = require('express-fileupload')
+app.use(fileupload({
+    useTempFiles: true,
+
+}))
 app.use(morgan('dev'))
 const autor_rutas = require('./routes/autor')
 app.use('/api/autor', autor_rutas)
