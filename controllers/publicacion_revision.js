@@ -1,4 +1,5 @@
 const s_pg = require("../services/postgres")
+const base64 = require('base64topdf');
 
 /// validar fecha de realización de una correción también que sea mayor a la fecha de subida
 
@@ -6,6 +7,15 @@ const s_pg = require("../services/postgres")
 let guardar_publicacion_revision = async(req, res) => {
         let servicio = new s_pg();
         let publicacion_revision = req.body;
+        let tmp = ''
+        try {
+            let archivo = req.files.archivo;
+            tmp = base64.base64Encode(archivo.tempFilePath)
+
+        } catch (erro) {
+            res.send({ error: erro, message: "error pdf" })
+            return
+        }
         try {
             let resp = (await middle_verificar_fecha(publicacion_revision.fechasubida, publicacion_revision.idpublicacion))
             let bool = true;
@@ -13,7 +23,7 @@ let guardar_publicacion_revision = async(req, res) => {
                 bool = resp.rows[0].plazo_maximo;
             }
             if (bool) {
-                _guardar(publicacion_revision, servicio).then(async bd_res => {
+                _guardar(publicacion_revision, servicio, tmp).then(async bd_res => {
                         res.send({
                             data: bd_res,
                             message: " agregado correctamente "
@@ -58,12 +68,12 @@ let verificar_revision = async(req, res, next) => {
     });
 }
 
-async function _guardar(publicacion_revision, servicio) {
+async function _guardar(publicacion_revision, servicio, archivo) {
 
     let sql = 'insert into pu_publicacion_revision(id_publicacion,archivo,id_evaluador,estado,fecha_subida)' +
         'values($1,$2,$3,$4,$5);'
     return await servicio.eje_sql(sql, [publicacion_revision.idpublicacion,
-        publicacion_revision.archivo, publicacion_revision.idevaluador, 0, publicacion_revision.fechasubida
+        archivo, publicacion_revision.idevaluador, 0, publicacion_revision.fechasubida
     ])
 }
 
