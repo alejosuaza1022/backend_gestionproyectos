@@ -109,8 +109,8 @@ let eliminar_evaluador = async(req, res) => {
 // no olvidar agregar el archivo
 let obtener_propuestas_nuevas = async(req, res) => {
     let servicio = new s_pg();
-    let sql = 'select titulo,pu_propuestas_publicaciones.id,area,facultad,tipo_publicacion,archivo from pu_propuestas_publicaciones left  join pu_publicacion_revision on pu_propuestas_publicaciones.id = id_publicacion where pu_publicacion_revision.id is null;'
-    await servicio.eje_sql(sql).then(bd_res => {
+    let sql = 'select pu_propuestas_publicaciones.id as id_publicacion,titulo,area,facultad,tipo_publicacion from pu_propuestas_publicaciones left  join pu_publicacion_revision on pu_propuestas_publicaciones.id = id_publicacion inner join pu_seguimientos_propuestas on pu_seguimientos_propuestas.id_propuesta = pu_propuestas_publicaciones.id where pu_publicacion_revision.id is null and pu_seguimientos_propuestas.estado = $1;'
+    await servicio.eje_sql(sql, ['aprobado']).then(bd_res => {
 
         res.status(200).send({
             publicaciones: bd_res.rows,
