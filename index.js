@@ -28,6 +28,9 @@ app.use('/api/evaluador', eval_rutas)
 const registro_evaluacion = require('./routes/registro_evaluacion')
 app.use('/api/registro_eval', registro_evaluacion)
 
+const mail = require('./routes/mail')
+app.use('/api/mail', mail)
+
 
 
 
