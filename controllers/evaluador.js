@@ -109,7 +109,7 @@ let eliminar_evaluador = async(req, res) => {
 // no olvidar agregar el archivo
 let obtener_propuestas_nuevas = async(req, res) => {
     let servicio = new s_pg();
-    let sql = 'select pu_propuestas_publicaciones.id as id_publicacion,titulo,area,facultad,tipo_publicacion from pu_propuestas_publicaciones left  join pu_publicacion_revision on pu_propuestas_publicaciones.id = id_publicacion inner join pu_seguimientos_propuestas on pu_seguimientos_propuestas.id_propuesta = pu_propuestas_publicaciones.id where pu_publicacion_revision.id is null and pu_seguimientos_propuestas.estado = $1;'
+    let sql = 'select pu_propuestas_publicaciones.id as id_publicacion,titulo,area,facultad,tipo_publicacion,pu_seguimientos_propuestas.archivo from pu_propuestas_publicaciones left  join pu_publicacion_revision on pu_propuestas_publicaciones.id = id_publicacion inner join pu_seguimientos_propuestas on pu_seguimientos_propuestas.id_propuesta = pu_propuestas_publicaciones.id where pu_publicacion_revision.id is null and pu_seguimientos_propuestas.estado = $1;'
     await servicio.eje_sql(sql, ['aprobado']).then(bd_res => {
 
         res.status(200).send({
@@ -125,7 +125,7 @@ let obtener_propuestas_nuevas = async(req, res) => {
 let obtener_en_espera_evaluar = async(req, res) => {
     let servicio = new s_pg();
     let id_evaluador = req.params.id
-    let sql = ' select pu_publicacion_revision.id,pu_propuestas_publicaciones.id as idpub,titulo,area,facultad,tipo_publicacion,archivo from pu_propuestas_publicaciones inner join pu_publicacion_revision on pu_propuestas_publicaciones.id = id_publicacion where estado = 0 and id_evaluador = $1;'
+    let sql = ' select pu_publicacion_revision.id,pu_propuestas_publicaciones.id as idpub,titulo,area,facultad,tipo_publicacion,archivo from pu_propuestas_publicaciones inner join pu_publicacion_revision on pu_propuestas_publicaciones.id = id_publicacion where estado = 1 and id_evaluador = $1;'
     await servicio.eje_sql(sql, [id_evaluador]).then(bd_res => {
         res.status(200).send({
             publicaciones: bd_res.rows,
