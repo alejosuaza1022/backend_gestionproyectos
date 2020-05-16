@@ -3,8 +3,8 @@ const morgan = require('morgan')
 var cors = require('cors')
 require('dotenv').config()
 
-
 const app = express();
+
 app.use(cors())
 app.use(express.json());
 const fileupload = require('express-fileupload')
