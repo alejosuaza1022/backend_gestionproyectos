@@ -40,13 +40,13 @@ let guardar_publicacion_revision = async(req, res) => {
 
                         }))
             } else {
-                res.send({
+                res.status(500).send({
                     message: "fecha exede el plazo limite"
                 });
 
             }
         } catch (error) {
-            res.send({
+            res.status(500).send({
                 message: 'hubo un error',
                 error: error
 
@@ -63,7 +63,7 @@ let verificar_revision = async(req, res, next) => {
         if (bd_res.rowCount === 0) {
             next();
             return;
-        } else res.send({
+        } else res.status(500).send({
             message: 'aún tiene una revisión pendiente o su evaluación ya fue realizada'
         });
     }).catch(error => {
