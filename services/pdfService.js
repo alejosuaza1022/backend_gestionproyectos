@@ -26,7 +26,7 @@ module.exports = { crearPDF };
 
 /*crearPDF({publicacion: "Test"}, "publicacionEvaluada")
 .then((res) =>{
-    fs.writeFile("./templates/nuevoPdf.pdf", res, (error) =>{
+    fs.writeFile("./files/nuevoPdf.pdf", res, (error) =>{
         if(error){
             console.log("error", error)
         }

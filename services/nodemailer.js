@@ -16,19 +16,31 @@ class servicioCorreo{
         });
     
         let data = req.body
-        let template;
-        if(data.tipo == "0"){
-            template = engine.leerArchivo('templates/publicacionEvaluada.html').toString()
 
-            template = engine.renderizarPlantilla(template, {
-                publicacion: data.publicacion
-            })
-        }
+        let template = engine.leerArchivo('./templates/' + data.template).toString()
+
+        template = engine.renderizarPlantilla(template, {
+            publicacion: data.publicacion
+        })
+
         let mailOptions = {
             from: process.env.EMAIL,
             to: data.to,
             subject: data.subject,
-            html: template
+            html: template,
+            attachments: [
+            {
+                filename: "logo.png",
+                path: "./files/images/logo.png",
+                cid: "logo"
+            }]
+        }
+
+        if(data.attachments){
+            mailOptions.attachments.push({
+                filename: "Retroalimentación.pdf",
+                path: "./files/" + data.attachments
+            })
         }
     
         transporter.sendMail(mailOptions, (error, info) =>{
