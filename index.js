@@ -31,6 +31,9 @@ app.use('/api/registro_eval', registro_evaluacion)
 const mail = require('./routes/mail')
 app.use('/api/mail', mail)
 
+const pdf = require('./routes/crearPdf')
+app.use('/api/pdf', pdf)
+
 
 
 

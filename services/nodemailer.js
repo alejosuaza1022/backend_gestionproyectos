@@ -17,10 +17,11 @@ class servicioCorreo{
     
         let data = req.body
 
-        let template = engine.leerArchivo('./templates/' + data.template).toString()
+        let template = engine.leerArchivo('./templates/' + data.template + '.html').toString()
 
         template = engine.renderizarPlantilla(template, {
-            publicacion: data.publicacion
+            publicacion: data.publicacion,
+            nombre: data.nombre
         })
 
         let mailOptions = {
@@ -38,7 +39,7 @@ class servicioCorreo{
 
         if(data.attachments){
             mailOptions.attachments.push({
-                filename: "Retroalimentación.pdf",
+                filename: "Evaluacion.pdf",
                 path: "./files/" + data.attachments
             })
         }
