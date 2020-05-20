@@ -1,6 +1,6 @@
 const s_pg = require("../services/postgres")
 const jwt = require("jsonwebtoken");
-
+require('dotenv').config();
 
 function validarLogin(persona) {
     if (!persona) {
@@ -36,14 +36,26 @@ async function consultarPersona(persona) {
     return await _servicio.eje_sql(sql, valores);
 };
 
-function generarToken(persona) {
+function generarTokenAutor(persona) {
     delete persona.clave;
-    let token = jwt.sign(persona, "123456789");
+    let token = jwt.sign(persona, process.env.KEY_AUTOR);
     return token;
 }
 
-function verificarToken(token) {
-    return jwt.verify(token, "123456789");
+function generarTokenEvaluador(persona) {
+    delete persona.clave;
+    let token = jwt.sign(persona, process.env.KEY_EVALUADOR);
+    return token;
+}
+
+
+
+function verificarTokenAutor(token) {
+    return jwt.verify(token, process.env.KEY_AUTOR);
+}
+
+function verificarTokenEvaluador(token) {
+    return jwt.verify(token, process.env.KEY_EVALUADOR);
 }
 
 
@@ -56,7 +68,9 @@ let validar_persona = async(req, res) => {
             let persona =
                 bd_res.rowCount > 0 ? bd_res.rows[0] : undefined;
             if (persona) {
-                let token = generarToken(persona);
+                let token = ''
+                token = persona.rol === 6 ? generarTokenAutor(persona) : generarTokenEvaluador(persona);
+                console.log(persona.rol)
                 res
                     .status(200)
                     .send({
@@ -76,27 +90,21 @@ let validar_persona = async(req, res) => {
 
 }
 let middleware_validar_persona = (req, res, next) => {
-    try {
-        let url = req.url;
-        if (url.includes('/login')) {
-            next();
-        } else {
-            let token = req.headers.token;
-            verificarToken(token);
-            next();
-        }
-    } catch (error) {
-        res.status(401).send({
-            ok: false,
-            info: error,
-            mensaje: "No autenticado.",
-        });
-    }
+    next()
 }
+
 let verificarAut = (req, res) => {
     try {
         let token = req.headers.token;
-        verificarToken(token);
+        let modulo = req.headers.modulo;
+        console.log(req)
+        if (modulo === 'autor') {
+            console.log('autor aut verigi');
+            verificarTokenAutor(token);
+        } else {
+            console.log('eval aut verifi');
+            verificarTokenEvaluador(token);
+        }
         res.status(200).send({
             ok: true,
             mensaje: "Autenticado.",
