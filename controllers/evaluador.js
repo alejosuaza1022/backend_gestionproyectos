@@ -6,7 +6,7 @@ let guardar_evaluador = async(req, res) => {
     let servicio = new s_pg();
     let evaluador = req.body;
     let sql = 'insert into acc_usuarios (id,nombre,apellidos,correo,ocupacion,clave,afiliacion_institucional,rol) values($1,$2,$3,$4,$5,md5($6),$7,$8);'
-    await servicio.eje_sql(sql, [evaluador.idevaluador, evaluador.nombre, evaluador.apellidos, evaluador.correo, evaluador.cargo, evaluador.clave, evaluador.afiliacion, 1]).
+    await servicio.eje_sql(sql, [evaluador.idevaluador, evaluador.nombre, evaluador.apellidos, evaluador.correo, evaluador.cargo, evaluador.clave, evaluador.afiliacion, 2]).
     then(bd_res => {
         res.status(200).send({
             message: ' evaluador agregado ',
@@ -22,7 +22,7 @@ let guardar_evaluador = async(req, res) => {
 
 let obtener_evaluadores = async(req, res) => {
     let servicio = new s_pg();
-    let sql = 'select id,nombre,apellidos,afiliacion_institucional,ocupacion,correo from acc_usuarios;'
+    let sql = 'select id ,nombre,apellidos,afiliacion_institucional as afiliacion,ocupacion as cargo,correo from acc_usuarios;'
     await servicio.eje_sql(sql).then(bd_res => {
         res.status(200).send({
             message: ' exitoso ',
@@ -37,7 +37,7 @@ let obtener_evaluadores = async(req, res) => {
 let obtener_evaluador = async(req, res) => {
     let servicio = new s_pg();
     let id_evaluador = req.params.id;
-    let sql = 'select id,nombre,apellidos,afiliacion_institucional,ocupacion,correo  from acc_usuarios where id = $1;'
+    let sql = 'select id,nombre,apellidos,afiliacion_institucional as afiliacion,ocupacion as cargo,correo  from acc_usuarios where id = $1;'
     await servicio.eje_sql(sql, [id_evaluador]).then(bd_res => {
         message = bd_res.rowCount === 0 ? 'no hay coincidencias' : 'exitoso';
         res.status(200).send({
@@ -56,16 +56,19 @@ let actualizar_evaluador = async(req, res) => {
     let evaluador = req.body;
     let id_evaluador = req.params.id;
     let sql = 'update acc_usuarios set nombre = $1,' +
-        'apellidos = $2 ,idevaluador = $3 , afiliacion_institucional = $4, ' +
-        'ocupacion = $5, correo = $6 where id = $5;'
+        'apellidos = $2 , afiliacion_institucional = $3, ' +
+        'ocupacion = $4, correo = $5 where id = $6;'
+
+
     await servicio.eje_sql(sql, [evaluador.nombre, evaluador.apellidos,
-        evaluador.idevaluador, evaluador.afiliacion,
-        evaluador.cargo, id_evaluador, evaluador.correo
+        evaluador.afiliacion,
+        evaluador.cargo, evaluador.correo, id_evaluador
     ]).
     then(bd_res => {
+        console.log(req.body);
         res.status(200).send({
-            message: ' evaluador actualizado ',
-            evaluador: bd_res.rows[0]
+            message: ' evaluador actualizado',
+            evaluador: bd_res
         });
     }).catch(error => res.status(500).send({
         message: 'se detecto un error',
