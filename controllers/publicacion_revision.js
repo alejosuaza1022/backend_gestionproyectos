@@ -9,11 +9,11 @@ let guardar_publicacion_revision = async(req, res) => {
         let publicacion_revision = req.body;
         try {
             let archivo = req.files.archivo;
-            console.log(archivo)
+            // console.log(archivo)
             tmp = base64.base64Encode(archivo.tempFilePath)
 
         } catch (erro) {
-            console.log(erro)
+            //console.log(erro)
             res.status(500).send({
                 error: erro,
                 message: "error pdf"

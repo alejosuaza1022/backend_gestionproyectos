@@ -22,6 +22,7 @@ let obtener_estado_publicacion = async(req, res) => {
 }
 
 
+
 let obtener_publicaciones_autor = async(req, res) => {
     let servicio = new s_pg();
     let id_autor = req.params.id

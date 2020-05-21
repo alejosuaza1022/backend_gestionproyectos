@@ -89,6 +89,17 @@ let validar_persona = async(req, res) => {
     }
 
 }
+
+let decode_pesona = (req, res) => {
+    let token = req.headers.token;
+    try {
+        let json = jwt.decode(token);
+        res.send({ info: json })
+    } catch (error) {
+        res.status(404).send({ info: json })
+    }
+
+}
 let middleware_validar_persona = (req, res, next) => {
     next()
 }
@@ -211,5 +222,6 @@ let verificarAut = (req, res) => {
 module.exports = {
     middleware_validar_persona,
     validar_persona,
-    verificarAut
+    verificarAut,
+    decode_pesona
 }
