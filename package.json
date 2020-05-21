@@ -1,30 +1,31 @@
 {
-  "name": "backend",
-  "version": "1.0.0",
-  "description": "'backend del proyecto de gestion de evaluación'",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "udem_proyectos",
-  "license": "ISC",
-  "dependencies": {
-    "base64topdf": "^1.1.8",
-    "body-parser": "^1.19.0",
-    "cors": "^2.8.5",
-    "dotenv": "^8.2.0",
-    "express": "^4.17.1",
-    "express-fileupload": "^1.1.7-alpha.3",
-    "fs": "0.0.1-security",
-    "handlebars": "^4.7.6",
-    "jsonwebtoken": "^8.5.1",
-    "jsreport-chrome-pdf": "^1.7.1",
-    "jsreport-core": "^2.7.2",
-    "jsreport-handlebars": "^2.1.0",
-    "morgan": "^1.10.0",
-    "nodemailer": "^6.4.6",
-    "nodemon": "^2.0.3",
-    "pg": "^8.0.3",
-    "puppeteer": "^3.0.4"
-  }
+    "name": "backend",
+    "version": "1.0.0",
+    "description": "'backend del proyecto de gestion de evaluación'",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "udem_proyectos",
+    "license": "ISC",
+    "dependencies": {
+        "base64topdf": "^1.1.8",
+        "body-parser": "^1.19.0",
+        "cors": "^2.8.5",
+        "dotenv": "^8.2.0",
+        "express": "^4.17.1",
+        "express-fileupload": "^1.1.7-alpha.3",
+        "fs": "0.0.1-security",
+        "handlebars": "^4.7.6",
+        "jsonwebtoken": "^8.5.1",
+        "jsreport-chrome-pdf": "^1.7.1",
+        "jsreport-core": "^2.7.2",
+        "jsreport-handlebars": "^2.1.0",
+        "morgan": "^1.10.0",
+        "nodemailer": "^6.4.6",
+        "nodemon": "^2.0.3",
+        "pg": "^8.0.3",
+        "puppeteer": "^3.0.4"
+    }
 }
