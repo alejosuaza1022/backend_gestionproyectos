@@ -43,7 +43,7 @@ const crearPDF = async(req, res) => {
 
         res.status(200).send({ ok: true, mensaje: "Pdf creado" })
     } catch (error) {
-        res.send(error)
+        res.send({ message: "hola", error: error.message })
     }
 };
 
