@@ -70,7 +70,6 @@ let validar_persona = async(req, res) => {
             if (persona) {
                 let token = ''
                 token = persona.rol === 6 ? generarTokenAutor(persona) : generarTokenEvaluador(persona);
-                console.log(persona.rol)
                 res
                     .status(200)
                     .send({
@@ -108,7 +107,6 @@ let verificarAut = (req, res) => {
     try {
         let token = req.headers.token;
         let modulo = req.headers.modulo;
-        console.log(req)
         if (modulo === 'autor') {
             console.log('autor aut verigi');
             verificarTokenAutor(token);
