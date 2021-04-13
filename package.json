@@ -19,7 +19,7 @@
         "fs": "0.0.1-security",
         "handlebars": "^4.7.6",
         "jsonwebtoken": "^8.5.1",
-        "jsreport-chrome-pdf": "^1.7.1",
+        "jsreport-chrome-pdf": "^1.10.0",
         "jsreport-core": "^2.7.2",
         "jsreport-handlebars": "^2.1.0",
         "morgan": "^1.10.0",
